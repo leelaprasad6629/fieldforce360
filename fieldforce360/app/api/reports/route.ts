@@ -23,7 +23,7 @@ async function connectToDatabase() {
   }
 }
 
-// GET: Fetch all service requests
+// GET: Fetch all service requests (reports)
 export async function GET() {
   try {
     await connectToDatabase();
@@ -37,13 +37,13 @@ export async function GET() {
   }
 }
 
-// POST: Create a new service request
+// POST: Create a new service request (report)
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
     const body = await req.json();
 
-    // Basic validation
+    // Basic validation (expand as needed)
     if (!body.customerId || !body.title) {
       return NextResponse.json(
         { success: false, error: 'customerId and title are required' },
