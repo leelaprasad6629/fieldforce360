@@ -91,7 +91,7 @@ export default function AnalyticsDashboard() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
               <YAxis domain={[70, 100]} tickFormatter={(v) => `${v}%`} />
-              <Tooltip formatter={(value: number) => `${value}%`} />
+              <Tooltip formatter={(value) => `${value ?? 0}%`} />
               <Legend />
               <Line
                 type="monotone"
@@ -144,7 +144,7 @@ export default function AnalyticsDashboard() {
                 innerRadius={45}
                 outerRadius={70}
                 label={({ name, percent }) =>
-                  `${name}: ${Math.round(percent * 100)}%`
+                  `${name}: ${Math.round((percent ?? 0) * 100)}%`
                 }
                 paddingAngle={2}
               >
@@ -153,7 +153,7 @@ export default function AnalyticsDashboard() {
                 ))}
               </Pie>
               <Legend verticalAlign="bottom" height={36} />
-              <Tooltip formatter={(value: number, name: string) => [`${value}`, name]} />
+              <Tooltip formatter={(value, name) => [`${value ?? 0}`, name]} />
             </PieChart>
           </ResponsiveContainer>
         </CardContent>

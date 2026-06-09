@@ -41,8 +41,8 @@ export default function ManagerDashboardPage() {
         ]);
         setStats(statsData);
         setWeeklyData(weekly);
-      } catch (err) {
-        // Handle errors as needed
+      } catch {
+        // Stats remain empty on fetch failure
       }
       setLoading(false);
     }

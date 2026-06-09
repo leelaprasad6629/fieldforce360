@@ -5,25 +5,34 @@ import React, { useEffect, useRef, useState } from 'react';
 // We assume a fetch endpoint for users (technicians) is available at /api/technicians
 // Each technician: { _id, name, role, location: "lat,lng", isActive }
 
-const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+const GOOGLE_MAPS_API_KEY =
+  process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ??
+  process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
 
-const loaderConfig = {
-  apiKey: GOOGLE_MAPS_API_KEY!,
-  version: "weekly",
+type Technician = {
+  _id: string;
+  name: string;
+  location?: string;
+  isActive: boolean;
 };
 
 const loadGoogleMaps = async () => {
-  // Dynamically import without a global import
-  const { Loader } = await import('@googlemaps/js-api-loader');
-  const loader = new Loader(loaderConfig);
-  return loader.load();
+  const { setOptions, importLibrary } = await import("@googlemaps/js-api-loader");
+  setOptions({
+    key: GOOGLE_MAPS_API_KEY ?? "",
+    v: "weekly",
+  });
+  await importLibrary("maps");
 };
 
 const MapPage = () => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstance = useRef<google.maps.Map>();
-  const [technicians, setTechnicians] = useState<any[]>([]);
+  const mapInstance = useRef<google.maps.Map | null>(null);
+  const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mapsReady, setMapsReady] = useState(
+    () => typeof window !== "undefined" && Boolean(window.google?.maps)
+  );
   const [selectedTechId, setSelectedTechId] = useState<string | null>(null);
 
   // Fetch technicians
@@ -41,7 +50,7 @@ const MapPage = () => {
   // Initialize map and markers
   useEffect(() => {
     let markers: google.maps.Marker[] = [];
-    if (!window.google || !mapRef.current) return;
+    if (!mapsReady || !window.google?.maps || !mapRef.current) return;
 
     // Default center
     const firstTechLoc = technicians?.[0]?.location
@@ -110,17 +119,19 @@ const MapPage = () => {
     return () => {
       markers.forEach(marker => marker.setMap(null));
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [technicians, selectedTechId]);
+  }, [technicians, selectedTechId, mapsReady]);
 
   // Load Google Maps JS API
   useEffect(() => {
-    if (window.google && window.google.maps) return; // Already loaded
-    loadGoogleMaps();
-  }, []);
+    if (!GOOGLE_MAPS_API_KEY || mapsReady) return;
+
+    loadGoogleMaps()
+      .then(() => setMapsReady(true))
+      .catch(() => undefined);
+  }, [mapsReady]);
 
   // When user selects a tech in sidebar, pan map and open marker window
-  const handleSidebarClick = (tech: any) => {
+  const handleSidebarClick = (tech: Technician) => {
     setSelectedTechId(tech._id);
     if (!mapInstance.current || !tech.location) return;
     const [lat, lng] = tech.location.split(',').map(Number);
@@ -129,7 +140,7 @@ const MapPage = () => {
   };
 
   return (
-    <div className="flex h-screen w-full">
+    <div className="flex h-full min-h-[calc(100dvh-0px)] w-full">
       {/* Sidebar */}
       <aside className="w-72 bg-white shadow-xl p-4 overflow-y-auto border-r">
         <h2 className="text-xl font-semibold mb-4">Technicians</h2>
@@ -161,7 +172,13 @@ const MapPage = () => {
       </aside>
       {/* Map */}
       <main className="flex-1 h-full relative">
-        <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
+        {!GOOGLE_MAPS_API_KEY ? (
+          <div className="flex h-full items-center justify-center text-muted-foreground">
+            Set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to enable the live map.
+          </div>
+        ) : (
+          <div ref={mapRef} style={{ width: "100%", height: "100%" }} />
+        )}
       </main>
     </div>
   );

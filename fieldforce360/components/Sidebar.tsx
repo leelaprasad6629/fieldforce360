@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { UserButton } from "@clerk/nextjs";
 import {
   LayoutDashboard,
   Map,
@@ -28,7 +29,7 @@ const navItems: SidebarNavItem[] = [
   },
   {
     name: "Live Map",
-    href: "/livemap",
+    href: "/map",
     icon: <Map className="w-5 h-5" />,
   },
   {
@@ -38,7 +39,7 @@ const navItems: SidebarNavItem[] = [
   },
   {
     name: "Technicians",
-    href: "/technicians",
+    href: "/technician",
     icon: <Users className="w-5 h-5" />,
   },
   {
@@ -93,6 +94,9 @@ export default function Sidebar() {
           );
         })}
       </nav>
+      <div className="border-t px-4 py-4">
+        <UserButton />
+      </div>
     </aside>
   );
 }

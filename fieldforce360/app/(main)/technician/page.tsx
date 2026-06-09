@@ -52,7 +52,7 @@ export default function TechnicianDashboard() {
             format(new Date(t.completedAt), "yyyy-MM-dd") === today
         );
         setCompletedToday(completed.length);
-      } catch (e) {
+      } catch {
         setTasks([]);
         setCompletedToday(0);
       }
@@ -131,7 +131,7 @@ export default function TechnicianDashboard() {
     <div className="max-w-3xl mx-auto py-10 space-y-6">
       <Card>
         <CardHeader className="flex flex-row items-center gap-4">
-          <CardTitle className="text-lg font-bold">Today's Completed Tasks</CardTitle>
+          <CardTitle className="text-lg font-bold">Today&apos;s Completed Tasks</CardTitle>
           <div className="ml-auto text-3xl font-mono">{completedToday}</div>
         </CardHeader>
       </Card>
