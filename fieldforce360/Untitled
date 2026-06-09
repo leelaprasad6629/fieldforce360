@@ -1,0 +1,15 @@
+# Step 1 - Push to GitHub
+git init
+git add .
+git commit -m "FieldForce 360 initial build"
+
+# Step 2 - Go to vercel.com
+# Sign in with GitHub
+# Click "Add New Project"
+# Select your repo
+
+# Step 3 - Add environment variables in Vercel:
+# Copy all values from your .env.local
+# Paste them in Vercel → Settings → Environment Variables
+
+# Step 4 - Click Deploy → Done! 🎉
