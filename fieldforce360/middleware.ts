@@ -2,7 +2,6 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
 
-
 export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {
     await auth.protect();
@@ -15,3 +14,6 @@ export const config = {
     "/(api|trpc)(.*)",
   ],
 };
+
+// Force Next.js to use the standard Node.js runtime instead of Edge
+export const runtime = 'nodejs';
